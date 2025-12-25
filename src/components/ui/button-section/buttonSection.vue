@@ -6,7 +6,7 @@ const props = defineProps<{
 	btnArr: string[]
 }>()
 
-const emits = defineEmits(['currentViewType'])
+const emits = defineEmits(['currentBtn'])
 
 const activeBtn = ref('')
 
@@ -27,7 +27,7 @@ activeBtn.value = props.btnArr[0] as string
 				 () => {
     activeBtn = btn
     const viewValue = btn.toLowerCase() as viewType
-    $emit('currentViewType', viewValue)
+    $emit('currentBtn', viewValue)
   }
 			"
 		>

@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-
-@custom-variant dark (&:is(.dark *));
+@import 'calendar.css';
+@custom-variant dark (&: is(.dark *));
 
 @font-face {
 	font-family: 'Source Sans Pro';
@@ -36,7 +36,6 @@
 	--color-accent: var(--accent);
 	--color-accent-foreground: var(--accent-foreground);
 	--color-destructive: var(--destructive);
-	--color-input: var(--input);
 	--color-ring: var(--ring);
 	--color-chart-1: var(--chart-1);
 	--color-chart-2: var(--chart-2);
@@ -58,10 +57,14 @@
 	--color-text-dark: #4d4f5c;
 	--color-text-gray: #a3a6b4;
 	--color-sidebar: #43425d;
-	--color-siderbar-dark: #3c3b53;
-
+	--color-sidebar-dark: #3c3b53;
+	--color-sidebar-light: #a3a0fb;
+	--color-gray-bg: #f5f6fa;
+	--color-input: #d6d6d6;
+	--color-red: #ff5f5f;
+	--color-btn: #6a6996;
 	/* FONTS */
-	--font-main: 'Source Sans Pro';
+	--font-main: 'Source Sans Pro', sans-serif;
 }
 
 :root {
