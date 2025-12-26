@@ -14,10 +14,10 @@
 							<img src="/src/assets/img/help-center.svg" alt="help-center" />
 						</a>
 						<a href="#">
-							<img src="/src/assets/img/help-center.svg" alt="help-center" />
+							<img src="/src/assets/img/message.svg" alt="message" />
 						</a>
 						<a href="#">
-							<img src="/src/assets/img/help-center.svg" alt="help-center" />
+							<img src="/src/assets/img/notifications.svg" alt="help-center" />
 						</a>
 					</div>
 				</div>
