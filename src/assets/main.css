@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'calendar.css';
 @custom-variant dark (&: is(.dark *));
 
 @font-face {
@@ -195,4 +194,164 @@
 	font-size: 0.9375rem; /* 15px */
 	line-height: 1.3125rem; /* 21px */
 	letter-spacing: 0.1875rem; /* 200 */
+}
+
+.fc-toolbar {
+	display: none !important;
+}
+
+[role='columnheader'] {
+	background-color: var(--color-gray-bg) !important;
+	border: none !important;
+	padding: 1rem 0 !important;
+	font-weight: 700;
+	font-size: 0.6875rem !important;
+	line-height: 0.875rem !important;
+	letter-spacing: 0 !important;
+	text-transform: uppercase;
+	color: var(--color-text-gray) !important;
+}
+
+.fc .fc-daygrid-day {
+	border-color: #eaf0f4;
+	color: var(--color-sidebar) !important;
+}
+
+.fc-daygrid-day-number {
+	margin-top: 1.0625rem !important;
+	margin-right: 0.9163rem !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+	background-color: var(--color-gray-bg) !important;
+	border-bottom: 1px var(--color-border) solid !important;
+}
+
+.fc-col-header-cell.fc-day-today {
+	border-bottom: 1px var(--color-border) solid !important;
+}
+
+.fc-daygrid-day-top {
+	height: 2.25rem !important;
+}
+
+.fc .fc-event {
+	padding: 0.375rem 0.875rem;
+	border-radius: 0.25rem !important;
+}
+
+.fc-daygrid-day-frame .fc-scrollgrid-sync-inner {
+	min-height: 135px !important;
+}
+
+.fc-event-title {
+	font-family: 'Source Sans Pro' !important;
+	font-weight: 400 !important;
+	font-size: 0.8125rem !important; /* 13px */
+	line-height: 1.25rem !important; /* 20px */
+	letter-spacing: 0 !important;
+	color: black;
+}
+
+.fc-event-time {
+	display: none !important;
+}
+
+.fc-daygrid-day-events {
+	margin-top: 10px !important;
+}
+
+.fc-timegrid-slot-label-cushion,
+.fc-timegrid-slot {
+	height: 3.0625rem !important;
+}
+
+.fc-timegrid-slot-label-cushion {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	font-weight: 400 !important;
+	font-size: 0.8125rem !important; /* 13px */
+	line-height: 1.25rem !important; /* 20px */
+	letter-spacing: 0 !important;
+	text-transform: uppercase;
+}
+
+col {
+	width: 5rem !important;
+}
+
+.fc .fc-timegrid-axis-frame {
+	justify-content: center;
+}
+
+.fc-day.fc-day-today.fc-timegrid-col {
+	background-color: var(--color-gray-bg) !important;
+}
+
+.fc-timegrid-divider.fc-cell-shaded {
+	display: none !important;
+}
+
+.fc-timegrid-event-harness.fc-timegrid-event-harness-inset {
+	flex-direction: column !important;
+}
+
+.fc-day-past.fc-timegrid-col,
+.fc-day-future.fc-timegrid-col {
+	background-color: white !important;
+}
+
+.fc-timegrid-now-indicator-line {
+	border-color: var(--color-primary) !important; /* Синій колір */
+	border-width: 2px !important; /* Товщина лінії */
+	border-style: solid !important; /* Суцільна лінія */
+	/* або для пунктирної: */
+	/* border-style: dashed !important; */
+}
+
+/* Іконка/стрілка зліва */
+.fc-timegrid-now-indicator-arrow {
+	border-color: var(--color-primary) !important; /* Колір стрілки */
+	border-width: 5px !important;
+	border-radius: 50%; /* Розмір стрілки */
+	left: 0 !important;
+}
+/* Дозволяємо вертикальне прокручування для основного контейнера */
+.fc-scroller.fc-scroller-liquid-absolute {
+	overflow-x: hidden !important;
+	overflow-y: scroll !important;
+}
+
+/* Заголовок залишаємо без скролу */
+thead .fc-scroller-harness .fc-scroller {
+	overflow: hidden !important;
+	width: 100% !important;
+}
+
+/* Тіло календаря - дозволяємо прокручування */
+tbody .fc-scroller-harness .fc-scroller {
+	overflow-x: hidden !important;
+	overflow-y: auto !important; /* або scroll */
+	width: 100% !important;
+	max-width: 1113px !important;
+}
+
+.fc-col-header,
+.fc-scroller {
+	width: 100% !important;
+}
+
+.fc-scrollgrid-sync-table {
+	width: 100% !important;
+}
+
+/* Прибираємо overflow: hidden з тіла календаря */
+.fc-daygrid-body.fc-daygrid-body-unbalanced.fc-daygrid-body-natural {
+	width: 100% !important;
+}
+
+.fc-daygrid-body.fc-daygrid-body-unbalanced.fc-daygrid-body-natural
+	[role='presentation'].fc-scrollgrid-sync-table {
+	width: 100% !important;
 }

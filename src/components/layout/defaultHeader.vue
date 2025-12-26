@@ -1,8 +1,8 @@
 <script lang="ts" setup></script>
 
 <template>
-	<header class="bg-white h-17.5 flex items-center">
-		<div class="container px-5 flex items-center justify-between">
+	<header class="bg-white h-17.5 flex items-center sticky top-0 z-[100]">
+		<div class="container m-auto px-5 flex items-center justify-between">
 			<button class="body-regular text-text-dark flex items-center gap-2.5">
 				<img src="/src/assets/img/search.svg" alt="search" />
 				Search transactions, invoices or help

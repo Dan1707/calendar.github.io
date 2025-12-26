@@ -19,7 +19,44 @@ const calendarRef = ref<InstanceType<typeof FullCalendar>>()
 const currentViewTitle = ref('')
 const viewType = ref<viewType>('month')
 
-const calendarOptions = ref({
+const x = ref(0)
+const y = ref(0)
+
+const POPUP_WIDTH = 201
+const POPUP_HEIGHT = 399.85
+const OFFSET = 10
+
+const calculatePopupPosition = (clientX: number, clientY: number) => {
+	let left = clientX + OFFSET
+	let top = clientY + OFFSET
+
+	const viewportWidth = window.innerWidth
+	const viewportHeight = window.innerHeight
+
+	if (left + POPUP_WIDTH > viewportWidth) {
+		left = clientX - POPUP_WIDTH - OFFSET
+	}
+
+	if (left < OFFSET) {
+		left = OFFSET
+	}
+
+	if (top + POPUP_HEIGHT > viewportHeight) {
+		top = clientY - POPUP_HEIGHT - OFFSET
+	}
+
+	if (top < OFFSET) {
+		top = OFFSET
+	}
+
+	if (POPUP_HEIGHT > viewportHeight - 2 * OFFSET) {
+		top = OFFSET
+	}
+
+	return { left, top }
+}
+
+const calendarOptions = {
 	plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
 	initialView: 'dayGridMonth',
 	headerToolbar: false,
@@ -32,7 +69,7 @@ const calendarOptions = ref({
 		hour: '2-digit',
 		minute: '2-digit',
 		hour12: true,
-		meridiem: 'short',
+		meridiem: 'short' as const,
 	},
 
 	slotEventOverlap: true,
@@ -41,22 +78,39 @@ const calendarOptions = ref({
 	editable: true,
 	nowIndicator: true,
 
+	views: {
+		dayGridMonth: {
+			eventDisplay: 'block',
+		},
+	},
+
 	height: 720,
 
 	dateClick: (info: DateClickArg) => {
 		selectedDate.value = info.date
+		selectedEvent.value = null
 		showPopup.value = true
 		popupType.value = 'create'
+
+		const position = calculatePopupPosition(
+			info.jsEvent.clientX,
+			info.jsEvent.clientY
+		)
+		x.value = position.left
+		y.value = position.top
 	},
 	eventClick: (info: EventClickArg) => {
-		showPopup.value = true
 		selectedEvent.value = info.event
+		selectedDate.value = info.event.start
+		showPopup.value = true
 		popupType.value = 'edit'
+
+		const rect = info.el.getBoundingClientRect()
+		const position = calculatePopupPosition(rect.left, rect.bottom)
+		x.value = position.left
+		y.value = position.top
 	},
-	eventDragStop: (info: DateClickArg) => {
-		console.log(info)
-	},
-})
+}
 
 const saveNewEvent = (event: calendarEvent) => {
 	const calendarApi = calendarRef.value?.getApi()
@@ -64,28 +118,49 @@ const saveNewEvent = (event: calendarEvent) => {
 	calendarApi?.addEvent({
 		title: event.title,
 		date: event.date,
+		start: event.date,
+		end: event.date,
+		allDay: false,
 		color: event.color,
 		backgroundColor: event.color,
-		allDay: true,
 		borderColor: event.color,
 		extendedProps: {
 			notes: event.extendedProps.notes,
 		},
 	})
 
-	showPopup.value = false
+	closePopup()
 }
 
 const editEvent = (event: calendarEvent) => {
+	if (!selectedEvent.value) return
+
 	selectedEvent.value.setProp('title', event.title)
-	selectedEvent.value.setProp('date', event.date)
-	selectedEvent.value.setProp('color', event.color)
+	selectedEvent.value.setAllDay(false)
+	selectedEvent.value.setStart(event.date)
+
+	const startDate = new Date(event.date)
+	const endDate = new Date(startDate.getTime() + 60 * 60 * 1000) // +1 година
+	selectedEvent.value.setEnd(endDate.toISOString())
+
 	selectedEvent.value.setProp('backgroundColor', event.color)
 	selectedEvent.value.setProp('borderColor', event.color)
 	selectedEvent.value.setExtendedProp('notes', event.extendedProps.notes)
 
+	closePopup()
+}
+
+const deleteEvent = () => {
+	if (!selectedEvent.value) return
+
+	selectedEvent.value.remove()
+	closePopup()
+}
+
+const closePopup = () => {
 	showPopup.value = false
 	selectedEvent.value = null
+	selectedDate.value = null
 }
 
 const handleViewTitle = () => {
@@ -101,14 +176,13 @@ const changeViewType = (activeType: viewType) => {
 	viewType.value = activeType
 	const calendarApi = calendarRef.value?.getApi()
 
-	// Змінено логіку для правильного перемикання view
 	let viewName = ''
 	if (activeType === 'month') {
 		viewName = 'dayGridMonth'
 	} else if (activeType === 'week') {
-		viewName = 'timeGridWeek' // timeGrid для Week з сіткою годин
+		viewName = 'timeGridWeek'
 	} else if (activeType === 'day') {
-		viewName = 'timeGridDay' // timeGrid для Day з сіткою годин
+		viewName = 'timeGridDay'
 	}
 
 	calendarApi?.changeView(viewName)
@@ -153,140 +227,16 @@ const handleNavBtns = (move: navBtn) => {
 			</div>
 			<FullCalendar class="mt-5" ref="calendarRef" :options="calendarOptions" />
 			<eventCreatePopup
-				:selectedDate="selectedDate as Date"
-				:type="popupType as 'create' | 'edit'"
 				v-if="showPopup"
+				:selectedDate="selectedDate as Date"
+				:selectedEvent="selectedEvent"
+				:type="popupType as 'create' | 'edit'"
 				@sendNewEvent="saveNewEvent"
 				@editEvent="editEvent"
-				@close="showPopup = false"
+				@deleteEvent="deleteEvent"
+				@close="closePopup"
+				:style="`position: fixed; left: ${x}px; top: ${y}px; z-index: 50;`"
 			/>
 		</div>
 	</div>
 </template>
-<style>
-.fc-toolbar {
-	display: none !important;
-}
-
-[role='columnheader'] {
-	background-color: var(--color-gray-bg) !important;
-	border: none !important;
-	padding: 1rem 0 !important;
-	font-weight: 700;
-	font-size: 0.6875rem !important;
-	line-height: 0.875rem !important;
-	letter-spacing: 0 !important;
-	text-transform: uppercase;
-	color: var(--color-text-gray) !important;
-}
-
-.fc .fc-daygrid-day {
-	border-color: #eaf0f4;
-	color: var(--color-sidebar) !important;
-}
-
-.fc-daygrid-day-number {
-	margin-top: 1.0625rem !important;
-	margin-right: 0.9163rem !important;
-}
-
-.fc .fc-daygrid-day.fc-day-today {
-	background-color: var(--color-gray-bg) !important;
-	border-bottom: 1px var(--color-border) solid !important;
-}
-
-.fc-col-header-cell.fc-day-today {
-	border-bottom: 1px var(--color-border) solid !important;
-}
-
-.fc-daygrid-day-top {
-	height: 2.25rem !important;
-}
-
-.fc .fc-event {
-	padding: 0.375rem 0.875rem;
-	border-radius: 0.25rem !important;
-}
-
-.fc-daygrid-day-frame .fc-scrollgrid-sync-inner {
-	min-height: 135px !important;
-}
-
-.fc-event-title {
-	font-family: 'Source Sans Pro' !important;
-	font-weight: 400 !important;
-	font-size: 0.8125rem !important; /* 13px */
-	line-height: 1.25rem !important; /* 20px */
-	letter-spacing: 0 !important;
-	color: white !important;
-}
-
-.fc-daygrid-event-dot {
-	display: none !important;
-}
-
-.fc-event-time {
-	display: none !important;
-}
-
-.fc-daygrid-day-events {
-	margin-top: 10px !important;
-}
-
-.fc-timegrid-slot-label-cushion,
-.fc-timegrid-slot {
-	height: 3.0625rem !important;
-}
-
-.fc-timegrid-slot-label-cushion {
-	display: flex !important;
-	align-items: center !important;
-	justify-content: center !important;
-	font-weight: 400 !important;
-	font-size: 0.8125rem !important; /* 13px */
-	line-height: 1.25rem !important; /* 20px */
-	letter-spacing: 0 !important;
-	text-transform: uppercase;
-}
-
-col {
-	width: 5rem !important;
-}
-
-.fc .fc-timegrid-axis-frame {
-	justify-content: center;
-}
-
-.fc-timegrid-slot.fc-timegrid-slot-lane {
-	background-color: var(--color-gray-bg) !important;
-}
-
-.fc-timegrid-divider.fc-cell-shaded {
-	display: none !important;
-}
-
-.fc-timegrid-event-harness.fc-timegrid-event-harness-inset {
-	flex-direction: column !important;
-}
-
-.fc-day-past.fc-timegrid-col,
-.fc-day-future.fc-timegrid-col {
-	background-color: white !important;
-}
-
-.fc-timegrid-now-indicator-line {
-	border-color: var(--color-primary) !important; /* Синій колір */
-	border-width: 2px !important; /* Товщина лінії */
-	border-style: solid !important; /* Суцільна лінія */
-	/* або для пунктирної: */
-	/* border-style: dashed !important; */
-}
-
-/* Іконка/стрілка зліва */
-.fc-timegrid-now-indicator-arrow {
-	border-color: var(--color-primary) !important; /* Колір стрілки */
-	border-width: 5px !important;
-	border-radius: 50%; /* Розмір стрілки */
-	left: 0 !important;
-}
-</style>
