@@ -55,7 +55,6 @@ const calculatePopupPosition = (clientX: number, clientY: number) => {
 
 	return { left, top }
 }
-
 const calendarOptions = {
 	plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
 	initialView: 'dayGridMonth',
@@ -66,8 +65,8 @@ const calendarOptions = {
 	slotDuration: '01:00:00',
 	slotLabelInterval: '01:00:00',
 	slotLabelFormat: {
-		hour: '2-digit',
-		minute: '2-digit',
+		hour: '2-digit' as const,
+		minute: '2-digit' as const,
 		hour12: true,
 		meridiem: 'short' as const,
 	},
@@ -110,7 +109,7 @@ const calendarOptions = {
 		x.value = position.left
 		y.value = position.top
 	},
-}
+} as any
 
 const saveNewEvent = (event: calendarEvent) => {
 	const calendarApi = calendarRef.value?.getApi()
@@ -225,6 +224,7 @@ const handleNavBtns = (move: navBtn) => {
 				/>
 				<p class="heading-medium text-center w-full">{{ currentViewTitle }}</p>
 			</div>
+
 			<FullCalendar class="mt-5" ref="calendarRef" :options="calendarOptions" />
 			<eventCreatePopup
 				v-if="showPopup"
